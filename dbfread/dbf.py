@@ -5,6 +5,7 @@ import os
 import sys
 import datetime
 import collections
+from io import BytesIO, UnsupportedOperation
 
 from .ifiles import ifind
 from .struct_parser import StructParser
@@ -55,7 +56,7 @@ DBFField = StructParser(
 
 def expand_year(year):
     """Convert 2-digit year to 4-digit year."""
-    
+
     if year < 80:
         return 2000 + year
     else:
@@ -69,9 +70,50 @@ class RecordIterator(object):
 
     def __iter__(self):
         return self._table._iter_records(self._record_type)
- 
+
     def __len__(self):
         return self._table._count_records(self._record_type)
+
+
+class DbfFileOpener(object):
+    """Open file or just use file like object"""
+    def __init__(self, file):
+        self.file = file
+        self.__should_close = False
+        if isinstance(file, str):
+            self.filename = file
+        elif hasattr(self.file, 'filename'):
+            self.filename = file.filename
+        elif hasattr(self.file, 'name'):
+            self.filename = file.name
+        else:
+            self.filename = ''
+        # if already file like object, check if seekable
+        # if not seekable, read content and use BytesIO later
+        self.opener = lambda: self.file
+        if isinstance(file, str):
+            self.opener = lambda self: open(self.filename, mode='rb')
+        else:
+            if not hasattr(self.file, 'seek'):
+                content = self.file.read()
+                self.opener = lambda self: BytesIO(content)
+            else:
+                try:
+                    self.file.seek(0)
+                except UnsupportedOperation:
+                    content = self.file.read()
+                    self.opener = lambda self: BytesIO(content)
+
+    def open(self):
+        return self
+
+    def __enter__(self):
+        self.file = self.opener(self)
+        return self.file
+
+    def __exit__(self, type, value, traceback):
+        if self.__should_close:
+            self.file.close()
 
 
 class DBF(object):
@@ -98,18 +140,23 @@ class DBF(object):
         else:
             self.recfactory = recfactory
 
-        # Name part before .dbf is the table name
-        self.name = os.path.basename(filename)
-        self.name = os.path.splitext(self.name)[0].lower()
-        self._records = None
-        self._deleted = None
-
-        if ignorecase:
+        if ignorecase and isinstance(filename, str):
             self.filename = ifind(filename)
             if not self.filename:
                 raise DBFNotFound('could not find file {!r}'.format(filename))
         else:
             self.filename = filename
+
+        self.file = DbfFileOpener(self.filename)
+        self.filename = self.file.filename
+
+        # Name part before .dbf is the table name
+        if not isinstance(filename, str):
+            filename = self.file.filename
+        self.name = os.path.basename(filename)
+        self.name = os.path.splitext(self.name)[0].lower()
+        self._records = None
+        self._deleted = None
 
         # Filled in by self._read_headers()
         self.memofilename = None
@@ -117,11 +164,11 @@ class DBF(object):
         self.fields = []       # namedtuples
         self.field_names = []  # strings
 
-        with open(self.filename, mode='rb') as infile:
+        with self.file.open() as infile:
             self._read_header(infile)
             self._read_field_headers(infile)
             self._check_headers()
-            
+
             try:
                 self.date = datetime.date(expand_year(self.header.year),
                                           self.header.month,
@@ -129,7 +176,7 @@ class DBF(object):
             except ValueError:
                 # Invalid date or '\x00\x00\x00'.
                 self.date = None
- 
+
         self.memofilename = self._get_memofilename()
 
         if load:
@@ -271,7 +318,7 @@ class DBF(object):
     def _count_records(self, record_type=b' '):
         count = 0
 
-        with open(self.filename, 'rb') as infile:
+        with self.file.open() as infile:
             # Skip to first record.
             infile.seek(self.header.headerlen, 0)
 
@@ -289,7 +336,7 @@ class DBF(object):
         return count
 
     def _iter_records(self, record_type=b' '):
-        with open(self.filename, 'rb') as infile, \
+        with self.file.open() as infile, \
              self._open_memofile() as memofile:
 
             # Skip to first record.
