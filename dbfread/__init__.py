@@ -22,6 +22,10 @@ from .deprecated_dbf import open, read
 from .exceptions import *
 from .field_parser import FieldParser, InvalidValue
 from .version import version_info, version as __version__
+from .codec_mazovia import register as register_mazovia_codec
+
+register_mazovia_codec()
+
 
 # Prevent splat import.
 __all__ = []

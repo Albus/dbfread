@@ -46,7 +46,7 @@ codepages = {
     0x66: ('cp865', 'Nordic MS-DOS'),
     0x67: ('cp861', 'Icelandic MS-DOS'),
     # 0x68: (None, 'Kamenicky (Czech) MS-DOS'),
-    # 0x69: (None, 'Mazovia (Polish) MS-DOS'),
+    0x69: ('mazovia', 'Mazovia (Polish) MS-DOS'),
     0x6a: ('cp737', 'Greek MS-DOS (437G)'),
     0x6b: ('cp857', 'Turkish MS-DOS'),
     0x78: ('cp950', 'Traditional Chinese '
