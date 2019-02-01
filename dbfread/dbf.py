@@ -79,7 +79,7 @@ class DbfFileOpener(object):
     """Open file or just use file like object"""
     def __init__(self, file):
         self.file = file
-        self.__should_close = False
+        self._should_close = False
         if isinstance(file, str):
             self.filename = file
         elif hasattr(self.file, 'filename'):
@@ -90,9 +90,10 @@ class DbfFileOpener(object):
             self.filename = ''
         # if already file like object, check if seekable
         # if not seekable, read content and use BytesIO later
-        self.opener = lambda: self.file
+        self.opener = lambda self: self.file
         if isinstance(file, str):
             self.opener = lambda self: open(self.filename, mode='rb')
+            self._should_close = True
         else:
             if not hasattr(self.file, 'seek'):
                 content = self.file.read()
@@ -112,7 +113,7 @@ class DbfFileOpener(object):
         return self.file
 
     def __exit__(self, type, value, traceback):
-        if self.__should_close:
+        if self._should_close:
             self.file.close()
 
 
