@@ -2,7 +2,7 @@
 A field parser that returns invalid values as InvalidValue objects
 instead of raising ValueError.
 """
-from dbfread import DBF, FieldParser, InvalidValue
+from bssapi_dbfread import DBF, FieldParser, InvalidValue
 
 class MyFieldParser(FieldParser):
     def parse(self, field, data):

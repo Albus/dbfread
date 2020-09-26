@@ -8,7 +8,15 @@ batch jobs and one-off scripts.
 
 ::
 
-    >>> from dbfread import DBF
+    >>> from bssapi_dbfread import DBF
+        >>> for record in DBF('people.dbf'):
+        ...     print(record)
+        OrderedDict([('NAME', 'Alice'), ('BIRTHDATE', datetime.date(1987, 3, 1))])
+        OrderedDict([('NAME', 'Bob'), ('BIRTHDATE', datetime.date(1980, 11, 12))])
+
+    By default records are streamed directly from the file.  If you have
+    enough memory you can instead load them into a list. This allows for
+    random access
     >>> for record in DBF('people.dbf'):
     ...     print(record)
     OrderedDict([('NAME', 'Alice'), ('BIRTHDATE', datetime.date(1987, 3, 1))])

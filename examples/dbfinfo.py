@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import sys
-from dbfread import DBF
+from bssapi_dbfread import DBF
 
 def show(*words):
     print('  ' + ' '.join(str(word) for word in words))

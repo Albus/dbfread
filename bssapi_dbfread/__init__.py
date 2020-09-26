@@ -3,7 +3,7 @@ Read DBF files with Python.
 
 Example:
 
-    >>> from dbfread import DBF
+    >>> from bssapi_dbfread import DBF
     >>> for record in DBF('people.dbf'):
     ...     print(record)
     OrderedDict([('NAME', 'Alice'), ('BIRTHDATE', datetime.date(1987, 3, 1))])

@@ -4,7 +4,7 @@ Return records as named tuples.
 This saves a lot of memory.
 """
 from collections import namedtuple
-from dbfread import DBF
+from bssapi_dbfread import DBF
 
 table = DBF('files/people.dbf', lowernames=True)
 

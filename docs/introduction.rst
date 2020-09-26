@@ -12,7 +12,10 @@ Opening a DBF File
 
 ::
 
-    >>> from dbfread import DBF
+    >>> from bssapi_dbfread import DBF
+        >>> table = DBF('people.dbf')
+
+    This returns a
     >>> table = DBF('people.dbf')
 
 This returns a ``DBF`` object. You can now iterate over records::

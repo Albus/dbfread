@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-import dbfread
+import bssapi_dbfread
 
 try:
     from setuptools import setup
@@ -22,12 +22,12 @@ elif sys.argv[-1] == "docs":
 
 setup(
     name='dbfread',
-    version=dbfread.__version__,
+    version=bssapi_dbfread.__version__,
     description='Read DBF Files with Python',
     long_description=open('README.rst', 'rt').read(),
-    author=dbfread.__author__,
-    author_email=dbfread.__email__,
-    url=dbfread.__url__,
+    author=bssapi_dbfread.__author__,
+    author_email=bssapi_dbfread.__email__,
+    url=bssapi_dbfread.__url__,
     package_data={'': ['LICENSE']},
     package_dir={'dbfread': 'dbfread'},
     packages = ['dbfread'],

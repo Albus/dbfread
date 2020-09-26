@@ -2,7 +2,7 @@
 Return records as objects with fields as attributes.
 """
 from __future__ import print_function
-from dbfread import DBF
+from bssapi_dbfread import DBF
 
 class Record(object):
     def __init__(self, items):
